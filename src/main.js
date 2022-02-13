@@ -10,6 +10,9 @@ import '@/styles/index.less'
 import Vant from 'vant'
 import 'vant/lib/index.css'
 
+// 设置动态rem基准值
+import 'lib-flexible/flexible.js'
+
 // 注册Vant组件
 Vue.use(Vant)
 
