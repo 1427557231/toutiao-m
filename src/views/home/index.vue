@@ -2,7 +2,14 @@
   <div class="home-container">
     <!-- 导航栏 -->
     <van-nav-bar class="page-nav-bar">
-      <van-button class="btn-search" slot="title" type="info" size="small" round text="搜索">
+      <van-button
+        class="btn-search"
+        slot="title"
+        type="info"
+        size="small"
+        round
+        text="搜索"
+      >
         <i slot="icon" class="toutiao toutiao-sousuo"></i>
       </van-button>
     </van-nav-bar>
@@ -17,23 +24,42 @@
       </van-tab>
 
       <div slot="nav-right" class="placeholder"></div>
-      <div slot="nav-right" class="btn-more">
+      <div slot="nav-right" class="btn-more" @click="isChennelEditShow = true">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </van-tabs>
     <!-- / 频道列表 -->
+    <!-- 频道编辑弹出层 -->
+    <van-popup
+      v-model="isChennelEditShow"
+      position="bottom"
+      closeable
+      :style="{ height: '100%' }"
+    >
+      <ChannelEdit
+        :my-channels="channels"
+        :active="active"
+        @changeActive="changeActive"
+      ></ChannelEdit
+    ></van-popup>
+    <!-- / 频道编辑弹出层 -->
   </div>
 </template>
 
 <script>
 import { getUserChannels } from '@/api/user'
 import ArticleList from './components/article-list.vue'
+import ChannelEdit from './components/channel-edit.vue'
+import { getItem } from '@/utils/storage'
+import { mapState } from 'vuex'
+
 export default {
   name: 'HomeIndex',
   data () {
     return {
       active: 0,
-      channels: null
+      channels: null,
+      isChennelEditShow: false
     }
   },
   created () {
@@ -42,16 +68,34 @@ export default {
   methods: {
     async loadChannels () {
       try {
-        const { data } = await getUserChannels()
-        this.channels = data.data.channels
-        // console.log(this.channels)
+        if (this.user) {
+          // 已登录，请求获取用户频道列表
+          const { data } = await getUserChannels()
+          this.channels = data.data.channels
+        } else {
+          // 未登录，判断是否有本地数据
+          if (getItem('TOUTIAO_CHANNELS')) {
+            this.channels = getItem('TOUTIAO_CHANNELS')
+          } else {
+            const { data } = await getUserChannels()
+            this.channels = data.data.channels
+          }
+        }
       } catch (err) {
         this.$toast('获取频道数据失败')
       }
+    },
+    changeActive (index, isChennelEditShow = true) {
+      this.active = index
+      this.isChennelEditShow = isChennelEditShow
     }
   },
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
+  },
+  computed: {
+    ...mapState(['user'])
   }
 }
 </script>
