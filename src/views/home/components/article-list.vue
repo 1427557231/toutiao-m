@@ -14,7 +14,11 @@
         error-text="请求失败，点击重新加载"
         @load="onLoad"
       >
-        <van-cell v-for="obj, index in list" :key="index" :title="obj.title" />
+        <ArticleItem
+          v-for="(obj, index) in list"
+          :key="index"
+          :article="obj"
+        ></ArticleItem>
       </van-list>
     </van-pull-refresh>
   </div>
@@ -22,6 +26,7 @@
 
 <script>
 import { getArticles } from '@/api/article'
+import ArticleItem from '@/components/article-item/index'
 export default {
   name: 'ArticleList',
   props: {
@@ -99,6 +104,9 @@ export default {
         this.isLoading = false
       }
     }
+  },
+  components: {
+    ArticleItem
   }
 }
 </script>
