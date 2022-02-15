@@ -32,7 +32,7 @@ export default {
   name: 'LayoutIndex',
   data () {
     return {
-      active: 0
+      active: 3
     }
   },
   methods: {}
