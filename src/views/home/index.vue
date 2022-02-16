@@ -9,6 +9,7 @@
         size="small"
         round
         text="搜索"
+        to="/search"
       >
         <i slot="icon" class="toutiao toutiao-sousuo"></i>
       </van-button>
