@@ -38,6 +38,7 @@
       v-else
       :searchHistories="searchHistories"
       @search="onSearch"
+      @searchClear="searchHistories = []"
     ></SearchHistory>
     <!-- 搜索历史记录 end -->
   </div>
@@ -47,6 +48,7 @@
 import SearchHistory from './components/search-history.vue'
 import SearchSuggestion from './components/search-suggestion.vue'
 import SearchResult from './components/search-result.vue'
+import { setItem, getItem } from '@/utils/storage.js'
 
 export default {
   name: 'SearchIndex',
@@ -54,7 +56,7 @@ export default {
     return {
       searchText: '',
       isResultShow: false,
-      searchHistories: [] // 搜索的历史记录数据
+      searchHistories: getItem('TOUTIAO_SEARCH_HISTORIES') || [] // 搜索的历史记录数据
     }
   },
   methods: {
@@ -78,6 +80,11 @@ export default {
     SearchHistory,
     SearchSuggestion,
     SearchResult
+  },
+  watch: {
+    searchHistories () {
+      setItem('TOUTIAO_SEARCH_HISTORIES', this.searchHistories)
+    }
   }
 }
 </script>
