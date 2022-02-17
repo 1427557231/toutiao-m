@@ -1,16 +1,36 @@
 <template>
-  <van-cell class="article-item">
-    <div slot="title" class="title van-multi-ellipsis--l2">
+  <!-- :to="'/article/' + article.art_id" -->
+  <!-- :to="`/article/${article.art_id}`" -->
+  <van-cell
+    class="article-item"
+    :to="{
+      // 根据路由名称进行跳转
+      name: 'article',
+      // 传递路由动态参数
+      params: {articleId: article.art_id} // 属性名：路由路径中设计的动态参数名称
+    }"
+  >
+    <div
+      slot="title"
+      class="title van-multi-ellipsis--l2"
+    >
       {{ article.title }}
     </div>
     <div slot="label">
-      <div class="cover-wrap" v-if="article.cover.type === 3">
+      <div
+        class="cover-wrap"
+        v-if="article.cover.type === 3"
+      >
         <div
           class="cover-item"
           v-for="(img, index) in article.cover.images"
           :key="index"
         >
-          <van-image class="cover-item-img" :src="img" fit="cover" />
+          <van-image
+            class="cover-item-img"
+            :src="img"
+            fit="cover"
+          />
         </div>
       </div>
       <div class="label-info-wrap">
