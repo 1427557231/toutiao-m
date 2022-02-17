@@ -56,7 +56,7 @@ export default {
         const { data } = await addComment({
           target: this.target.toString(),
           content: this.message,
-          art_id: this.articleId ? this.articleId.toString : this.articleId
+          art_id: this.articleId ? this.articleId.toString() : this.articleId
         })
         this.message = '' // 清空文本框
         this.$emit('post-success', data.data)
