@@ -83,7 +83,14 @@
           ref="article-content"
         ></div>
         <van-divider>正文结束</van-divider>
-
+        <!-- 文章评论列表 -->
+        <CommentList
+          :source="article.art_id"
+          :list="commentList"
+          @onload-success="totalCommentCount = $event.total_count"
+          @reply-click="onReplyClick"
+        />
+        <!-- / 文章评论列表 -->
         <!-- 底部区域 -->
         <div class="article-bottom">
           <van-button
@@ -91,13 +98,19 @@
             type="default"
             round
             size="small"
+            @click="isPostShow = true"
           >写评论</van-button>
           <div class="blank"></div>
           <van-button
             icon="comment-o"
-            :badge="article.comm_count"
-            color="#777"
-          />
+            class="btn-item"
+          >
+            <van-icon
+              slot="icon"
+              name="comment-o"
+              :badge="totalCommentCount"
+            />
+          </van-button>
           <CollectArticle
             class="btn-item"
             v-model="article.is_collected"
@@ -108,12 +121,20 @@
             v-model="article.attitude"
             :articleId="article.art_id"
           />
-          <van-button
-            icon="share"
-            color="#777777"
-          />
+          <van-button icon="share" />
         </div>
         <!-- /底部区域 -->
+        <!-- 发布评论 -->
+        <van-popup
+          v-model="isPostShow"
+          position="bottom"
+        >
+          <CommentPost
+            :target="articleId"
+            @post-success="onPostSuccess"
+          ></CommentPost>
+        </van-popup>
+        <!-- / 发布评论 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -142,6 +163,16 @@
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
 
+    <!-- 评论回复 -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      style="height: 100%"
+    >
+      <CommentReply v-if="isReplyShow" :comment="currentComment" @close="isReplyShow = false"></CommentReply>
+    </van-popup>
+    <!-- / 评论回复 -->
+
   </div>
 </template>
 
@@ -151,14 +182,29 @@ import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user/index.vue'
 import CollectArticle from '@/components/collect-article/index.vue'
 import LikeArticle from '@/components/like-article/index.vue'
+import CommentList from './components/comment-list.vue'
+import CommentPost from './components/comment-post.vue'
+import CommentReply from './components/comment-reply.vue'
 
 export default {
   name: 'ArticleIndex',
-  components: { FollowUser, CollectArticle, LikeArticle },
+  components: {
+    FollowUser,
+    CollectArticle,
+    LikeArticle,
+    CommentList,
+    CommentPost,
+    CommentReply
+  },
   props: {
     articleId: {
       type: [Number, String, Object],
       required: true
+    }
+  },
+  provide: function () {
+    return {
+      articleId: this.articleId
     }
   },
   data () {
@@ -166,7 +212,12 @@ export default {
       article: {}, // 文章的信息
       loading: true, // 文件加载的状态
       errStatus: 0, // 失败的状态码
-      followLoading: false // 关注按钮加载状态
+      followLoading: false, // 关注按钮加载状态
+      totalCommentCount: 0,
+      isPostShow: false, // 写评论弹出层
+      commentList: [], // 评论列表
+      isReplyShow: false,
+      currentComment: {} // 当前点击回复的评论
     }
   },
   computed: {},
@@ -208,6 +259,16 @@ export default {
           })
         }
       })
+    },
+    onPostSuccess (data) {
+      this.isPostShow = false // 关闭弹出层
+      console.log(data)
+      this.commentList.unshift(data.new_obj)
+    },
+    onReplyClick (comment) {
+      this.currentComment = comment
+      this.isReplyShow = true
+      console.log(comment)
     }
   }
 }
